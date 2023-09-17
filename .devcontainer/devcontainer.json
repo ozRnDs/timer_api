@@ -1,0 +1,14 @@
+// {
+//     "name": "Timer Project",
+//     "dockerComposeFile": "../../docker-compose.yml",
+//     "service": "timer_api",
+//     "workspaceFolder": "/src",
+//     "shutdownAction": "stopCompose"
+// }
+
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "forwardPorts": [5000]
+}
