@@ -3,11 +3,11 @@ from uuid import UUID
 from pydantic import BaseModel
 from enum import Enum
 
-class TimerStatus(int, Enum):
-    waiting = 0
-    executing = 1
-    done = 2
-    failed = 3
+class TimerStatus(str, Enum):
+    waiting = 'waiting'
+    executing = 'executing'
+    done = 'done'
+    failed = 'failed'
 
 class SetTimerResponse(BaseModel):
     id: UUID = ""
