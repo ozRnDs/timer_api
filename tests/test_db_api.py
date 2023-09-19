@@ -1,6 +1,7 @@
 from datetime import datetime
 import pytest
 import uuid
+from fastapi import HTTPException
 
 from components.db_api import db_instance
 from components.db_api import DbApi
@@ -27,9 +28,9 @@ def test_get_timer_existing_timer(db_fixture: DbApi):
     response = db_fixture.get_timer_information(timer_id)
 
     # Assert
-    assert response["timer_id"]==timer_id
-    assert type(response["timer_status"])==str
-    assert type(response["timer_invoke_time"])==datetime
+    assert response.timer_id==timer_id
+    assert type(response.timer_status)==str
+    assert type(response.timer_date)==datetime
 
 def test_get_timer_non_existing_timer(db_fixture: DbApi):
     # SETUP
@@ -42,7 +43,7 @@ def test_get_timer_non_existing_timer(db_fixture: DbApi):
     response = db_fixture.get_timer_information(timer_id)
 
     # Assert
-    assert response=={}
+    assert response==None
 
 def test_get_timer_illegal_uuid(db_fixture: DbApi):
     # SETUP
@@ -52,7 +53,8 @@ def test_get_timer_illegal_uuid(db_fixture: DbApi):
         pytest.fail("Couldn't finish the test's setup")
 
     # Assert
-    response = db_fixture.get_timer_information(timer_id)
+    with pytest.raises(HTTPException) as excinfo:
+        response = db_fixture.get_timer_information(timer_id)
 
     # Assert
-    assert response=={}
+    assert excinfo.value.detail == "Illegal UUID"
