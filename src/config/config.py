@@ -22,7 +22,7 @@ class ApplicationConfiguration:
         
 
     def extract_env_variables(self):
-        for attr, attr_type in self.__annotations__.item():
+        for attr, attr_type in self.__annotations__.items():
             try:
                 self.__setattr__(attr, (attr_type)(os.environ[attr]))
             except Exception as err:
