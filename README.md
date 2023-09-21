@@ -1,3 +1,17 @@
+**TIMER REST-API - TABLE OF CONTENTS**
+
+- [Overview](#overview)
+  - [Rest API](#rest-api)
+    - [Swagger](#swagger)
+    - [Basic Routes](#basic-routes)
+  - [Component Logic](#component-logic)
+  - [Environment Variables](#environment-variables)
+- [Quick Start](#quick-start)
+  - [System Compose](#system-compose)
+  - [Component Docker](#component-docker)
+- [Testing](#testing)
+
+
 # Overview
 The timer api component is part of the timer_project.
 
@@ -6,7 +20,8 @@ The Interface enables the following actions:
 1. Register new timed task to the service
 2. Question existing tasks
 
-Multiple components (pods) can work simultaneously. However, the components need external load-balancer to be fully scalable.
+>Multiple components (pods) can work simultaneously.  
+However, the components need external load-balancer to be fully scalable.
 
 ## Rest API
 ### Swagger
@@ -14,7 +29,7 @@ The component includes a swagger interface at route: http://*{component_name/com
 ### Basic Routes
 1. POST /timer/
 
-   1. Request Body: The time from now to invoke the specified url
+   * **Request Body**: The time from now to invoke the specified url
         ```json
         {
             "hours": {int},
@@ -23,7 +38,7 @@ The component includes a swagger interface at route: http://*{component_name/com
             "url": {str}
         }
         ```
-    1. Response Body: The timer id and time left in seconds to invoke it
+    * **Response Body**: The timer id and time left in seconds to invoke it
         ```json
         {
             "id": {UUID as str},
@@ -31,10 +46,10 @@ The component includes a swagger interface at route: http://*{component_name/com
         }
         ```
 2. GET /timer/{timer_id}
-    1. Request Query: The timer's id
+    * **Request Query**: The timer's id
         
         timer_id must be UUID
-    1. Response Body: The timer's full status and time left to invoke it
+    * **Response Body**: The timer's full status and time left to invoke it
         ```json
         {
             "id": {UUID as str},
@@ -49,6 +64,7 @@ The component includes a swagger interface at route: http://*{component_name/com
 1. The component will launch a uvicorn server for the Rest Api.
 
 ## Environment Variables
+The variables should be set at the docker run command or through the main project's compose file.
 
 | Environment Variable Name | Description | Optional/Mandatory |Notes |
 | -- | -- | -- | -- |
@@ -61,7 +77,7 @@ The component includes a swagger interface at route: http://*{component_name/com
 
 # Quick Start
 ## System Compose
-The component is containerized using docker. It should be deployed using the timer_project compose file with the other components of the system.
+The component is containerized using docker. It should be deployed using the timer_project compose file with the other components of the system. Refer to the timer project [README](../README.md)
 ## Component Docker
 The component can be deployed using docker command:
 ```bash
@@ -72,5 +88,23 @@ export DB_PASSWORD=1234
 export IMAGE_NAME=timer_api
 export IMAGE_TAG=0.0.1
 export REST_PORT=80
+
 docker run -d --rm --name $COMPONENT_NAME -e DB_HOST=$DB_HOST -e DB_USER=$DB_USER -e DB_PASSWORD=$DB_PASSWORD -p $REST_PORT:5000 $IMAGE_NAME:$IMAGE_TAG
+```
+
+# Testing
+Some basic test were being used while implementing the service (Based on the TDD methodology).  
+The tests require running MySQL container on the test machine:
+```bash
+
+export COMPONENT_NAME=timer_db
+export DB_PASSWORD=1234
+export SERVER_PORT=3306
+
+docker run -d --rm --name $COMPONENT_NAME -p $SERVER_PORT:3306 -e MYSQL_ROOT_PASSWORD=$DB_PASSWORD mysql:latest
+```
+
+CLI command to run the tests:
+```bash
+python3 -m pytest ./tests
 ```
