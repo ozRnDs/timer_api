@@ -16,8 +16,8 @@ from classes.timer import TimerInformation
 TABLES = {}
 TABLES['timers'] = (
     "CREATE TABLE timers ("
-    " timer_id BINARY(16) PRIMARY KEY,"
-    " timer_url VARCHAR(2083),"
+    " timer_id BINARY(16) NOT NULL,"
+    " timer_url VARCHAR(2083) NOT NULL,"
     " timer_status ENUM ('waiting','executing','done','failed') NOT NULL,"
     " timer_invoke_time DATETIME NOT NULL)"
     " ENGINE=InnoDB"
@@ -146,11 +146,8 @@ class DbApi():
 
     def __del__(self):
         try:
-            if (self.current_cursor):
-                    self.current_cursor.close()
             if (self.db_connection):
                 self.db_connection.close()
-            logger.info("Connection to db is closed")
         except Exception as err:
             logger.error(f"Couldn't close DB Connection: {err}")
 
@@ -160,6 +157,8 @@ class DbApi():
         if type(err) in (mysql.connector.errors.OperationalError, mysql.connector.errors.DatabaseError, mysql.connector.Error):
             if 'MySQL Connection not available' in str(err) or err.errno in (2013,2003):
                 self.__db_reconnect_handler__()
+            if err.errno == 1146:
+                self.create_table(TABLES["timers"])  
             logger.error(f"Unexpected DB Error: {err}")
             raise HTTPException(status_code=503, detail=f"Cannot Communicate with DB")
         logger.error(f"Unexpected Error: {err}")
